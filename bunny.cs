@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using bunny;
 namespace Mai{
   class bunnies{
@@ -19,22 +20,26 @@ namespace Mai{
     Bunny bun = new Bunny(sex,Names.Init(sex),(string)Bunny.Choose(Colors),id);
     id++;
     bunlist.Add(bun);}
-    while (true){
-    List<Bunny> males = new List<Bunny> {};
-    List<Bunny> females = new List<Bunny> {};
-    foreach (Bunny bun in bunlist) {
+  List<Bunny> males = new List<Bunny> {};
+  List<Bunny> females = new List<Bunny> {};
+
+    while (bunlist.Count>0){
+      bunlist = bunlist.OrderByDescending(bunn=>bunn.Age).ToList();
+    males.Clear();females.Clear();
+    foreach (Bunny bun in new List<Bunny> (bunlist)) {
 
       try
       {
-              Console.Write("{0},{1},{2},{3}\t",bun.Sex,bun.Name,bun.Age,bun.Id);
+              bun.Tick(bunlist);
+              Console.Write("{0} ",bun.Sex);
               if (bun.Sex == "M") males.Add(bun);
               if (bun.Sex == "F") females.Add(bun);
-              bun.Tick(bunlist);
+
       }
-      catch(Exception e)
-      {
-      }
+      catch{}
     }
+    Console.WriteLine();
+    Console.WriteLine(new String('_',Console.WindowWidth));
     Console.WriteLine();
     foreach (Bunny mal in males) {
       foreach (Bunny fem in females) {
@@ -45,6 +50,23 @@ namespace Mai{
       catch(Exception e){}
       }
     }
+    if (Console.KeyAvailable)
+    {
+    ConsoleKeyInfo key = Console.ReadKey(true);
+    switch (key.Key)
+    {
+        case ConsoleKey.K:
+        Console.ForegroundColor  = ConsoleColor.Red;
+        Console.WriteLine("You, the semi-god of this bunny world, decided to kill off half of these cute bunnies. You monster!");
+        Console.ForegroundColor  = ConsoleColor.White;
+        for(int index=0;index<(int)(bunlist.Count/2);++index){
+          bunlist.RemoveAt(Bunny.ChooseIndex<Bunny>(bunlist));
+        }
+            break;
+        default:
+        break;
+    }
+  }
     }
   }
   }
@@ -91,7 +113,7 @@ namespace bunny{
       //Random rand = new Random();
       return tlist[rand.Next(0,tlist.Count)];
     }
-    private static int ChooseIndex<T> (List<T> tlist){
+    public static int ChooseIndex<T> (List<T> tlist){
       //Random rand = new Random();
       return rand.Next(0,tlist.Count);
     }
@@ -105,20 +127,25 @@ namespace bunny{
       bunlist.Add(child);
     }
   public void kill(List<Bunny> bunlist){
-    bunlist.RemoveAt(bunlist.IndexOf(this));
+    try{
+    bunlist.RemoveAt(bunlist.IndexOf(this));}catch{}
     return;
   }
   public void Tick(List<Bunny> bunlist){
     //choose = new Choose<Bunny>();
     this.Age += 1;
-    if (bunlist.Count > 1000){
-      for(int index=0;index<(int)(bunlist.Count/2);++index){
-        bunlist.Remove((Bunny)Choose<Bunny>(bunlist));
-      }}
-    if (this.Sex != "X"){
-      if (this.Age >= 2) this.Sex = this.Sex.ToUpper();
-      if (this.Age > 10) this.kill(bunlist);
-    }else{if (this.Age>50) this.kill(bunlist); else {Bunny mybun = (Bunny)Choose<Bunny>(bunlist); mybun.Sex="X";}}
+    if (bunlist.Count >= 1000){
+      Console.ForegroundColor  = ConsoleColor.Red;
+      Console.WriteLine("Food Shortage occured. Half of these cute bunnies are gonna die!!!!");
+      Console.ForegroundColor  = ConsoleColor.White;
+      while(bunlist.Count >= 1000){
+      for(int index=0;index < (int)(bunlist.Count/2);++index){
+        bunlist.RemoveAt ( ChooseIndex<Bunny>(bunlist) );
+      }}}
+    if (this.Sex != "X"){try{
+      if (this.Age > 2) this.Sex = this.Sex.ToUpper();
+      if (this.Age > 3) this.kill(bunlist);}catch{}
+    }else{if (this.Age > 20) this.kill(bunlist); else{}}
     }
   }
   class Names{
