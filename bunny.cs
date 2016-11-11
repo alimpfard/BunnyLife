@@ -57,7 +57,7 @@ namespace Mai{
     {
         case ConsoleKey.K:
         Console.ForegroundColor  = ConsoleColor.Red;
-        Console.WriteLine("You, the semi-god of this bunny world, decided to kill off half of these cute bunnies. You monster!");
+        Console.WriteLine("You, the semi-god[Not Demigod] of this bunny world, decided to kill off half of these cute bunnies. You monster!");
         Console.ForegroundColor  = ConsoleColor.White;
         for(int index=0;index<(int)(bunlist.Count/2);++index){
           bunlist.RemoveAt(Bunny.ChooseIndex<Bunny>(bunlist));
